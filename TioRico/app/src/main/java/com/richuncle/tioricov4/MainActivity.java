@@ -31,10 +31,14 @@ import com.google.android.gms.tasks.Task;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
     double latitud, longitud;
+
+    ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     private final int REQUEST_CHECK_CODE = 8989;
     private LocationSettingsRequest.Builder builder;
@@ -127,9 +131,9 @@ public class MainActivity extends AppCompatActivity {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss a dd-MMM-yyyy");
             String time_Stamp = simpleDateFormat.format(calendar.getTime());
             String Message = String.format("12345%.7f,%.7f,%s", location.getLatitude(), location.getLongitude(), time_Stamp);
-            //Send TCP Messages
-            TCP_Sender messageSender = new TCP_Sender();
-            messageSender.execute(Message);
+            //Send UDP Messages
+            UDPSender client = new UDPSender(Message, 9090);
+            executorService.submit(client);
             txtLat.setText(String.format("%.7f",latitud));
             txtLong.setText(String.format("%.7f",longitud));
         }
